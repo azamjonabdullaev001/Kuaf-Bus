@@ -57,17 +57,17 @@ func Login(db *sql.DB) http.HandlerFunc {
 	// Проверка пароля ТОЛЬКО для админа
 	if user.UserType == "admin" {
 		if req.Password == "" {
-			log.Printf("Admin login requires password")
+			log.Printf("Password required for admin")
 			http.Error(w, "Password required for admin", http.StatusUnauthorized)
 			return
 		}
+
 		if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
-			log.Printf("Password verification failed for admin %s: %v", req.UniversityID, err)
+			log.Printf("Invalid admin password")
 			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 			return
 		}
 	}
-	// Для студентов и водителей пароль НЕ проверяется - вход только по ID
 
 	log.Printf("Login successful for user: %s", req.UniversityID)
 

@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "7e7bb94d-1b3c-4dc8-85e2-a95b4f7e2102"
+      }
+    },
+    "android": {
+      "package": "com.supreme001.kuafbus"
+    }
+  }
+}
