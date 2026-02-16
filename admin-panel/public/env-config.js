@@ -1,0 +1,4 @@
+window.ENV = {
+  API_URL: '__API_URL__',
+  WS_URL: '__WS_URL__'
+};

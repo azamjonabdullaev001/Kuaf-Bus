@@ -1,0 +1,70 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: bus-tracking-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bususer}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-buspassword}
+      POSTGRES_DB: ${POSTGRES_DB:-bus_tracking}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - bus-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bususer}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend (Go)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bus-tracking-backend
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: ${PORT:-8080}
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-bususer}
+      DB_PASSWORD: ${DB_PASSWORD:-buspassword}
+      DB_NAME: ${DB_NAME:-bus_tracking}
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-change-in-production}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:19006}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bus-network
+    restart: unless-stopped
+
+  # Admin Panel (React)
+  admin-panel:
+    build:
+      context: ./admin-panel
+      dockerfile: Dockerfile
+    container_name: bus-tracking-admin
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+    networks:
+      - bus-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  bus-network:
+    driver: bridge

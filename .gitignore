@@ -1,0 +1,53 @@
+# Игнорирование зависимостей
+node_modules/
+vendor/
+
+# Игнорирование конфигураций IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Игнорирование build артефактов
+build/
+dist/
+*.exe
+*.dll
+*.so
+*.dylib
+main
+
+# Игнорирование логов
+*.log
+logs/
+
+# Игнорирование переменных окружения
+.env
+.env.local
+.env.production
+
+# Игнорирование Docker volumes
+postgres_data/
+
+# Игнорирование временных файлов
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Expo
+.expo/
+.expo-shared/
+
+# React Native
+.expo/
+.expo-shared/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/

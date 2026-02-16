@@ -1,0 +1,88 @@
+# Test API Endpoints
+# Используйте этот файл с curl или Postman
+
+# 1. Вход как админ
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "university_id": "ADMIN001",
+  "password": "admin123"
+}
+
+###
+
+# 2. Создание студента (замените TOKEN на полученный токен)
+POST http://localhost:8080/api/admin/students
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+{
+  "university_id": "STUDENT001",
+  "password": "student123",
+  "first_name": "Иван",
+  "last_name": "Иванов",
+  "middle_name": "Иванович"
+}
+
+###
+
+# 3. Создание водителя
+POST http://localhost:8080/api/admin/drivers
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+{
+  "university_id": "DRIVER001",
+  "password": "driver123",
+  "first_name": "Петр",
+  "last_name": "Петров",
+  "middle_name": "Петрович"
+}
+
+###
+
+# 4. Получить всех студентов
+GET http://localhost:8080/api/admin/students
+Authorization: Bearer TOKEN
+
+###
+
+# 5. Получить всех водителей
+GET http://localhost:8080/api/admin/drivers
+Authorization: Bearer TOKEN
+
+###
+
+# 6. Вход как студент
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "university_id": "STUDENT001",
+  "password": "student123"
+}
+
+###
+
+# 7. Обновить координаты (после входа как водитель)
+POST http://localhost:8080/api/users/location?user_id=2
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+{
+  "latitude": 55.7558,
+  "longitude": 37.6173
+}
+
+###
+
+# 8. Получить координаты всех водителей
+GET http://localhost:8080/api/users/drivers-locations
+Authorization: Bearer TOKEN
+
+###
+
+# 9. Получить профиль
+GET http://localhost:8080/api/users/profile?user_id=1
+Authorization: Bearer TOKEN

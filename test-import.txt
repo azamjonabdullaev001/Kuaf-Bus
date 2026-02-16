@@ -1,0 +1,4 @@
+university_id	first_name	last_name	middle_name
+TEST001	Тест	Тестов	Тестович
+TEST002	Проверка	Проверкина	Проверочна
+TEST003	Демо	Демонов	Демонович

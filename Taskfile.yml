@@ -1,0 +1,67 @@
+version: '3'
+
+tasks:
+  install:backend:
+    desc: Установить зависимости backend
+    dir: backend
+    cmds:
+      - go mod download
+
+  install:admin:
+    desc: Установить зависимости admin panel
+    dir: admin-panel
+    cmds:
+      - npm install
+
+  install:mobile:
+    desc: Установить зависимости mobile app
+    dir: bus
+    cmds:
+      - npm install
+
+  install:all:
+    desc: Установить все зависимости
+    cmds:
+      - task: install:backend
+      - task: install:admin
+      - task: install:mobile
+
+  dev:backend:
+    desc: Запустить backend в dev режиме
+    dir: backend
+    cmds:
+      - go run main.go
+
+  dev:admin:
+    desc: Запустить admin panel в dev режиме
+    dir: admin-panel
+    cmds:
+      - npm start
+
+  dev:mobile:
+    desc: Запустить mobile app
+    dir: bus
+    cmds:
+      - npx expo start
+
+  docker:up:
+    desc: Запустить Docker контейнеры
+    cmds:
+      - docker-compose up -d
+
+  docker:down:
+    desc: Остановить Docker контейнеры
+    cmds:
+      - docker-compose down
+
+  docker:logs:
+    desc: Показать логи Docker контейнеров
+    cmds:
+      - docker-compose logs -f
+
+  docker:rebuild:
+    desc: Пересобрать и запустить Docker контейнеры
+    cmds:
+      - docker-compose down
+      - docker-compose build --no-cache
+      - docker-compose up -d

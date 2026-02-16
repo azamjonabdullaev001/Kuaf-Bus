@@ -1,0 +1,20 @@
+[
+  {
+    "university_id": "12345678",
+    "first_name": "Иван",
+    "last_name": "Иванов",
+    "middle_name": "Иванович"
+  },
+  {
+    "university_id": "87654321",
+    "first_name": "Мария",
+    "last_name": "Петрова",
+    "middle_name": "Сергеевна"
+  },
+  {
+    "university_id": "11223344",
+    "first_name": "Алексей",
+    "last_name": "Сидоров",
+    "middle_name": "Дмитриевич"
+  }
+]
