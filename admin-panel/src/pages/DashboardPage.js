@@ -410,9 +410,6 @@ function DashboardPage() {
               <button onClick={() => fileInputRef.current.click()} className="btn-import">
                 📁 Импорт
               </button>
-              <button onClick={downloadTemplate} className="btn-template">
-                📥 Шаблон
-              </button>
               <button 
                 onClick={() => setShowDeleteAllModal(true)} 
                 className="btn-delete-all"

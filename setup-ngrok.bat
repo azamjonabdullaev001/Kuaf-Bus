@@ -10,7 +10,8 @@ echo.
 set /p TOKEN="Вставьте ваш Authtoken и нажмите Enter: "
 echo.
 echo Добавляю токен...
-ngrok.exe config add-authtoken %TOKEN%
+ngrok config add-authtoken 39NAssMa0comx5Bb5XSySBSsQZG_75aRqE9wJfLspsVs5DP75
+
 echo.
 echo ================================================
 echo Готово! Теперь перезапустите ngrok:
