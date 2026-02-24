@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../services/api';
 import * as XLSX from 'xlsx';
+import { getTranslation as t } from '../translations/translations';
 import './DashboardPage.css';
 
 function DashboardPage() {
@@ -58,7 +59,7 @@ function DashboardPage() {
       }
     } catch (error) {
       console.error('Error loading data:', error);
-      alert('Ошибка при загрузке данных: ' + (error.response?.data || error.message));
+      alert(t('errorLoadingData') + ' ' + (error.response?.data || error.message));
     }
   };
 
@@ -71,7 +72,8 @@ function DashboardPage() {
         await adminAPI.createDriver(formData);
       }
       
-      alert(`${activeTab === 'students' ? 'Студент' : 'Водитель'} успешно создан!\nID: ${formData.university_id}\n\nДля входа пользователь должен использовать только свой ID (пароль не требуется)`);
+      const userType = activeTab === 'students' ? t('student') : t('driver');
+      alert(`${userType} ${t('userCreatedSuccess')} ${formData.university_id}${t('userLoginInfo')}`);
       
       setShowModal(false);
       setFormData({
@@ -89,7 +91,7 @@ function DashboardPage() {
       // Загрузка обновленных данных
       await loadData();
     } catch (error) {
-      alert('Ошибка при создании пользователя: ' + (error.response?.data || error.message));
+      alert(t('errorCreatingUser') + ' ' + (error.response?.data || error.message));
     }
   };
 
@@ -134,7 +136,7 @@ function DashboardPage() {
         }
 
         if (data.length === 0) {
-          alert('Файл пустой или неправильный формат');
+          alert(t('emptyFile'));
           return;
         }
 
@@ -185,7 +187,7 @@ function DashboardPage() {
   const applyMapping = () => {
     // Validate that required fields are mapped
     if (!columnMapping.university_id || !columnMapping.first_name || !columnMapping.last_name) {
-      alert('Пожалуйста, укажите соответствие для обязательных полей:\n- Университетский ID\n- Имя\n- Фамилия');
+      alert(`${t('mappingDescription')}\n- ${t('universityId')}\n- ${t('firstName')}\n- ${t('lastName')}`);
       return;
     }
 
@@ -207,7 +209,7 @@ function DashboardPage() {
       });
 
     if (mappedData.length === 0) {
-      alert('Нет валидных строк для импорта.\nУбедитесь, что файл содержит данные с заполненными полями:\n- Университетский ID\n- Имя\n- Фамилия');
+      alert(`${t('noData')}.\n- ${t('universityId')}\n- ${t('firstName')}\n- ${t('lastName')}`);
       return;
     }
 
@@ -220,7 +222,7 @@ function DashboardPage() {
   const handleImport = async () => {
     try {
       if (!importData || importData.length === 0) {
-        alert('Нет данных для импорта');
+        alert(t('noData'));
         return;
       }
 
@@ -239,17 +241,17 @@ function DashboardPage() {
       
       const { success, failed, total, errors } = response.data;
       
-      let message = `Импорт завершен за ${duration} сек:\n\n`;
-      message += `✓ Успешно: ${success} из ${total}\n`;
+      let message = `${t('import')} ${duration} sek:\n\n`;
+      message += `✓ ${t('importSuccess')}: ${success} ${t('of')} ${total}\n`;
       if (failed > 0) {
-        message += `✗ Ошибок: ${failed}\n\n`;
+        message += `✗ ${t('errors')}: ${failed}\n\n`;
         if (errors && errors.length > 0) {
-          message += `Детали ошибок:\n`;
+          message += `${t('errorDetails')}:\n`;
           errors.slice(0, 5).forEach(err => {
             message += `• ${err}\n`;
           });
           if (errors.length > 5) {
-            message += `... и еще ${errors.length - 5} ошибок\n`;
+            message += `... ${t('andMore')} ${errors.length - 5} ${t('moreErrors')}\n`;
           }
         }
       }
@@ -267,26 +269,10 @@ function DashboardPage() {
       // Загрузка обновленных данных
       await loadData();
     } catch (error) {
-      alert('Ошибка при импорте: ' + (error.response?.data?.message || error.message));
+      alert(t('errorCreatingUser') + ' ' + (error.response?.data?.message || error.message));
     } finally {
       setIsImporting(false);
     }
-  };
-
-  const downloadTemplate = () => {
-    const template = [
-      {
-        university_id: '12345678',
-        first_name: 'Иван',
-        last_name: 'Иванов',
-        middle_name: 'Иванович'
-      }
-    ];
-
-    const ws = XLSX.utils.json_to_sheet(template);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Template');
-    XLSX.writeFile(wb, `template_${activeTab}.xlsx`);
   };
 
   const handleSearch = async (query) => {
@@ -311,13 +297,13 @@ function DashboardPage() {
   };
 
   const handleDeleteUser = async (userId, userName) => {
-    if (!window.confirm(`Вы уверены, что хотите удалить пользователя ${userName}?`)) {
+    if (!window.confirm(`${userName} - ${t('confirmDelete')}?`)) {
       return;
     }
 
     try {
       await adminAPI.deleteUser(userId);
-      alert('Пользователь успешно удален');
+      alert(t('deleteAllSuccess'));
       
       // Если был активен поиск, обновляем результаты поиска
       if (isSearching && searchQuery) {
@@ -327,13 +313,13 @@ function DashboardPage() {
       // Всегда обновляем полный список
       await loadData();
     } catch (error) {
-      alert('Ошибка при удалении: ' + (error.response?.data || error.message));
+      alert(t('errorDeletingAll') + ' ' + (error.response?.data || error.message));
     }
   };
 
   const handleDeleteAll = async () => {
     if (deleteAllConfirmation !== 'DELETE ALL USERS') {
-      alert('Пожалуйста, введите точный текст подтверждения: DELETE ALL USERS');
+      alert(t('typeToConfirm') + ': DELETE ALL USERS');
       return;
     }
 
@@ -353,16 +339,16 @@ function DashboardPage() {
       // Загружаем обновленные данные
       await loadData();
     } catch (error) {
-      alert('Ошибка при удалении: ' + (error.response?.data || error.message));
+      alert(t('errorDeletingAll') + ' ' + (error.response?.data || error.message));
     }
   };
 
   return (
     <div className="dashboard">
       <nav className="navbar">
-        <h1>Панель администратора</h1>
+        <h1>{t('adminPanel')}</h1>
         <button onClick={handleLogout} className="btn-logout">
-          Выйти
+          {t('logout')}
         </button>
       </nav>
 
@@ -377,7 +363,7 @@ function DashboardPage() {
               setIsSearching(false);
             }}
           >
-            Студенты
+            {t('students')}
           </button>
           <button
             className={activeTab === 'drivers' ? 'tab active' : 'tab'}
@@ -388,34 +374,34 @@ function DashboardPage() {
               setIsSearching(false);
             }}
           >
-            Водители
+            {t('drivers')}
           </button>
         </div>
 
         <div className="content">
           <div className="header">
-            <h2>{activeTab === 'students' ? 'Список студентов' : 'Список водителей'}</h2>
+            <h2>{activeTab === 'students' ? t('listOfStudents') : t('listOfDrivers')}</h2>
             <div className="header-actions">
               <input
                 type="text"
-                placeholder="Поиск по имени, фамилии или ID..."
+                placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="search-input"
                 style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ddd', marginRight: '10px' }}
               />
               <button onClick={() => setShowModal(true)} className="btn-add">
-                + Добавить {activeTab === 'students' ? 'студента' : 'водителя'}
+                + {activeTab === 'students' ? t('addStudent') : t('addDriver')}
               </button>
               <button onClick={() => fileInputRef.current.click()} className="btn-import">
-                📁 Импорт
+                📁 {t('import')}
               </button>
               <button 
                 onClick={() => setShowDeleteAllModal(true)} 
                 className="btn-delete-all"
                 style={{ backgroundColor: '#dc3545', color: 'white' }}
               >
-                🗑️ Удалить всех
+                🗑️ {t('deleteAll')}
               </button>
               <input
                 ref={fileInputRef}
@@ -432,12 +418,12 @@ function DashboardPage() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Университетский ID</th>
-                  <th>Имя</th>
-                  <th>Фамилия</th>
-                  <th>Отчество</th>
-                  <th>Тип</th>
-                  <th>Действия</th>
+                  <th>{t('universityId')}</th>
+                  <th>{t('firstName')}</th>
+                  <th>{t('lastName')}</th>
+                  <th>{t('middleName')}</th>
+                  <th>{t('type')}</th>
+                  <th>{t('confirmDelete')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -462,14 +448,14 @@ function DashboardPage() {
                       <td>{user.first_name}</td>
                       <td>{user.last_name}</td>
                       <td>{user.middle_name || '-'}</td>
-                      <td>{user.user_type === 'student' ? 'Студент' : 'Водитель'}</td>
+                      <td>{user.user_type === 'student' ? t('student') : t('driver')}</td>
                       <td>
                         <button 
                           onClick={() => handleDeleteUser(user.id, `${user.first_name} ${user.last_name}`)}
                           className="btn-delete-user"
                           style={{ backgroundColor: '#dc3545', color: 'white', padding: '5px 10px', borderRadius: '5px', border: 'none', cursor: 'pointer' }}
                         >
-                          Удалить
+                          {t('confirmDelete')}
                         </button>
                       </td>
                     </tr>
@@ -479,7 +465,7 @@ function DashboardPage() {
             </table>
             {isSearching && searchResults.length === 0 && searchQuery && (
               <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-                Ничего не найдено
+                {t('noData')}
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', borderTop: '1px solid #ddd' }}>
@@ -489,9 +475,10 @@ function DashboardPage() {
                   const total = displayList?.length || 0;
                   const startIndex = (currentPage - 1) * itemsPerPage + 1;
                   const endIndex = Math.min(currentPage * itemsPerPage, total);
+                  const listType = activeTab === 'students' ? t('studentsLowerCase') : t('driversLowerCase');
                   return total > 0 
-                    ? `Показано: ${startIndex}-${endIndex} из ${total} ${activeTab === 'students' ? 'студентов' : 'водителей'}`
-                    : `Нет ${activeTab === 'students' ? 'студентов' : 'водителей'}`;
+                    ? `${t('showing')}: ${startIndex}-${endIndex} ${t('of')} ${total} ${listType}`
+                    : `${t('noData')} ${listType}`;
                 })()}
               </div>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -516,10 +503,10 @@ function DashboardPage() {
                           backgroundColor: 'white'
                         }}
                       >
-                        ← Назад
+                        ← {t('previous')}
                       </button>
                       <span style={{ color: '#666' }}>
-                        Страница {currentPage} из {totalPages}
+                        {t('showing')} {currentPage} {t('of')} {totalPages}
                       </span>
                       <button 
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
@@ -533,7 +520,7 @@ function DashboardPage() {
                           backgroundColor: 'white'
                         }}
                       >
-                        Вперёд →
+                        {t('next')} →
                       </button>
                     </>
                   );
@@ -547,10 +534,10 @@ function DashboardPage() {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Добавить {activeTab === 'students' ? 'студента' : 'водителя'}</h2>
+            <h2>{activeTab === 'students' ? t('addStudent') : t('addDriver')}</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label>Университетский ID *</label>
+                <label>{t('universityId')} *</label>
                 <input
                   type="text"
                   value={formData.university_id}
@@ -560,7 +547,7 @@ function DashboardPage() {
               </div>
 
               <div className="form-group">
-                <label>Имя *</label>
+                <label>{t('firstName')} *</label>
                 <input
                   type="text"
                   value={formData.first_name}
@@ -570,7 +557,7 @@ function DashboardPage() {
               </div>
 
               <div className="form-group">
-                <label>Фамилия *</label>
+                <label>{t('lastName')} *</label>
                 <input
                   type="text"
                   value={formData.last_name}
@@ -580,7 +567,7 @@ function DashboardPage() {
               </div>
 
               <div className="form-group">
-                <label>Отчество</label>
+                <label>{t('middleName')}</label>
                 <input
                   type="text"
                   value={formData.middle_name}
@@ -590,10 +577,10 @@ function DashboardPage() {
 
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowModal(false)} className="btn-cancel">
-                  Отмена
+                  {t('cancel')}
                 </button>
                 <button type="submit" className="btn-submit">
-                  Создать
+                  {t('create')}
                 </button>
               </div>
             </form>
@@ -604,17 +591,16 @@ function DashboardPage() {
       {showMappingModal && (
         <div className="modal-overlay" onClick={() => setShowMappingModal(false)}>
           <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
-            <h2>Настройка соответствия колонок</h2>
+            <h2>{t('columnMapping')}</h2>
             <p className="mapping-description">
-              Выберите, какие колонки из вашего файла соответствуют полям в базе данных.
-              <br />
-              <strong>Обязательные поля:</strong> Университетский ID, Имя, Фамилия
+              {t('mappingDescription')}<br />
+              <strong>{t('required')}:</strong> {t('universityId')}, {t('firstName')}, {t('lastName')}
             </p>
             
             <div className="mapping-container">
               <div className="mapping-row">
                 <label className="mapping-label required">
-                  Университетский ID *
+                  {t('universityId')} *
                 </label>
                 <select 
                   value={columnMapping.university_id}
@@ -635,7 +621,7 @@ function DashboardPage() {
 
               <div className="mapping-row">
                 <label className="mapping-label required">
-                  Имя *
+                  {t('firstName')} *
                 </label>
                 <select 
                   value={columnMapping.first_name}
@@ -656,7 +642,7 @@ function DashboardPage() {
 
               <div className="mapping-row">
                 <label className="mapping-label required">
-                  Фамилия *
+                  {t('lastName')} *
                 </label>
                 <select 
                   value={columnMapping.last_name}
@@ -677,7 +663,7 @@ function DashboardPage() {
 
               <div className="mapping-row">
                 <label className="mapping-label">
-                  Отчество
+                  {t('middleName')}
                 </label>
                 <select 
                   value={columnMapping.middle_name}
@@ -698,15 +684,15 @@ function DashboardPage() {
             </div>
 
             <div className="file-preview">
-              <strong>Найдено записей в файле:</strong> {rawFileData.length}
+              <strong>{t('rowsFound')}:</strong> {rawFileData.length}
             </div>
 
             <div className="modal-actions">
               <button type="button" onClick={() => setShowMappingModal(false)} className="btn-cancel">
-                Отмена
+                {t('cancel')}
               </button>
               <button type="button" onClick={applyMapping} className="btn-submit">
-                Далее →
+                {t('next')} →
               </button>
             </div>
           </div>
@@ -716,17 +702,17 @@ function DashboardPage() {
       {showImportModal && (
         <div className="modal-overlay" onClick={() => setShowImportModal(false)}>
           <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
-            <h2>Предварительный просмотр импорта</h2>
-            <p>Найдено записей: {importData.length}</p>
+            <h2>{t('previewData')}</h2>
+            <p>{t('rowsFound')}: {importData.length}</p>
             
             <div className="import-preview">
               <table>
                 <thead>
                   <tr>
-                    <th>Университетский ID</th>
-                    <th>Имя</th>
-                    <th>Фамилия</th>
-                    <th>Отчество</th>
+                    <th>{t('universityId')}</th>
+                    <th>{t('firstName')}</th>
+                    <th>{t('lastName')}</th>
+                    <th>{t('middleName')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -741,7 +727,7 @@ function DashboardPage() {
                 </tbody>
               </table>
               {importData.length > 10 && (
-                <p className="preview-note">Показаны первые 10 записей из {importData.length}</p>
+                <p className="preview-note">{t('showing')} 10 {t('of')} {importData.length}</p>
               )}
             </div>
 
@@ -752,7 +738,7 @@ function DashboardPage() {
                 className="btn-cancel"
                 disabled={isImporting}
               >
-                Отмена
+                {t('cancel')}
               </button>
               <button 
                 type="button" 
@@ -765,8 +751,8 @@ function DashboardPage() {
                 }}
               >
                 {isImporting 
-                  ? `⏳ Импортируется... (${importData.length} записей)`
-                  : `Импортировать ${importData.length} записей`
+                  ? `⏳ ${t('importing')} (${importData.length})`
+                  : `${t('import')} ${importData.length}`
                 }
               </button>
             </div>
@@ -777,16 +763,13 @@ function DashboardPage() {
       {showDeleteAllModal && (
         <div className="modal-overlay" onClick={() => setShowDeleteAllModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ color: '#dc3545' }}>⚠️ Удаление всех пользователей</h2>
-            <p style={{ marginBottom: '20px' }}>
-              Это действие удалит <strong>всех студентов и водителей</strong> из базы данных.<br/>
-              Администраторы НЕ будут удалены.<br/><br/>
-              <strong>Это действие необратимо!</strong>
+            <h2 style={{ color: '#dc3545' }}>⚠️ {t('deleteAllUsers')}</h2>
+            <p style={{ marginBottom: '20px' }} dangerouslySetInnerHTML={{ __html: t('deleteWarning') }}>
             </p>
             
             <div className="form-group">
               <label style={{ fontWeight: 'bold', marginBottom: '10px', display: 'block' }}>
-                Для подтверждения введите точный текст:
+                {t('typeToConfirm')}:
               </label>
               <div style={{ 
                 backgroundColor: '#f8f9fa', 
@@ -796,13 +779,13 @@ function DashboardPage() {
                 fontFamily: 'monospace',
                 fontSize: '14px'
               }}>
-                DELETE ALL USERS
+                {t('confirmText')}
               </div>
               <input
                 type="text"
                 value={deleteAllConfirmation}
                 onChange={(e) => setDeleteAllConfirmation(e.target.value)}
-                placeholder="Введите текст подтверждения"
+                placeholder={t('typeToConfirm')}
                 style={{ 
                   width: '100%', 
                   padding: '10px', 
@@ -822,7 +805,7 @@ function DashboardPage() {
                 }} 
                 className="btn-cancel"
               >
-                Отмена
+                {t('cancel')}
               </button>
               <button 
                 type="button" 
@@ -831,7 +814,7 @@ function DashboardPage() {
                 style={{ backgroundColor: '#dc3545' }}
                 disabled={deleteAllConfirmation !== 'DELETE ALL USERS'}
               >
-                Удалить всех пользователей
+                {t('deleteAllUsers')}
               </button>
             </div>
           </div>

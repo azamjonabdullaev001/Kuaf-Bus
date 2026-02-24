@@ -1,0 +1,98 @@
+================================================================
+🚀 ADMIN PANEL - O'ZBEK TILIGA O'ZGARTIRISH 
+================================================================
+
+MUAMMO: Docker eski kodni saqlagan, o'zgarishlar ko'rinmagan
+
+YECHIM: 3 TA VARIANT
+
+================================================================
+📦 VARIANT 1: DOCKER QAYTA QURISH (TAVSIYA)
+================================================================
+
+1. Ishga tushiring:
+   
+   rebuild-admin-uzbek.bat
+
+2. Bu avtomatik ravishda:
+   ✅ Eski konteynerini o'chiradi
+   ✅ Keshni tozalaydi
+   ✅ Yangi kod bilan qayta quradi
+   ✅ Ishga tushiradi
+
+3. Brauzerda oching: http://localhost:3001
+   
+4. MUHIM! Brauzer keshini tozalang:
+   Ctrl + Shift + R
+
+================================================================
+💻 VARIANT 2: DOCKER'SIZ ISHLAB CHIQISH (TEZROQ)
+================================================================
+
+1. Ishga tushiring:
+
+   start-admin-dev.bat
+
+2. Bu admin panelni to'g'ridan-to'g'ri ishga tushiradi
+   (Docker'siz, port 3000)
+
+3. Backend ishlab turishi kerak:
+   docker-compose up backend postgres
+
+4. Brauzerda oching: http://localhost:3000
+
+================================================================
+⚡ VARIANT 3: SUPER TEZKOR (Agar shoshilsangiz)
+================================================================
+
+Terminal'da:
+
+cd admin-panel
+npm start
+
+================================================================
+✅ NATIJA - Siz ko'rishingiz kerak:
+================================================================
+
+Ma'muriyat paneli                    (eski: Панель администратора)
+├── Talabalar                        (eski: Студенты)
+├── Haydovchilar                     (eski: Водители)
+│
+└── Tugmalar:
+    ├── + Talaba qo'shish            (eski: Добавить студента)
+    ├── 📁 Import qilish             (eski: Импорт)
+    ├── 🗑️ Hammasini o'chirish      (eski: Удалить всех)
+    └── ❌ SHABLON O'CHIRILDI!       (eski: 📥 Шаблон)
+
+================================================================
+🔍 AGAR HALI HAM RUS TILI CHIQSA:
+================================================================
+
+1. Brauzer keshini tozalang:
+   - Chrome: Ctrl+Shift+Delete → "Cached images"
+   - Firefox: Ctrl+Shift+Delete → "Cache"
+   - Yoki: Incognito/Private rejimda oching
+
+2. Docker qayta ishga tushiring:
+   docker-compose restart admin-panel
+
+3. Yoki butun Docker'ni qayta quring:
+   docker-compose down
+   docker-compose up -d --build
+
+================================================================
+📝 O'ZGARISHLAR:
+================================================================
+
+✅ Uzbek tili standart qilib qo'yildi
+✅ Barcha matnlar uzbek tiliga tarjima qilindi
+✅ Shablon tugmasi butunlay o'chirildi
+✅ Talabalar/Haydovchilar - uzbek tilida
+✅ Barcha xabarlar - uzbek tilida
+
+================================================================
+
+MUVAFFAQIYAT! 🎉
+
+Agar savollar bo'lsa, quyidagi faylni o'qing:
+DOCKER_REBUILD_UZBEK.md

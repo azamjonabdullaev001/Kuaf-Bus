@@ -12,6 +12,7 @@ type User struct {
 	UserType           string     `json:"user_type"` // student, driver, admin
 	Latitude           *float64   `json:"latitude,omitempty"`
 	Longitude          *float64   `json:"longitude,omitempty"`
+	Heading            *float64   `json:"heading,omitempty"` // Direction in degrees (0-360)
 	LastLocationUpdate *time.Time `json:"last_location_update,omitempty"`
 	CreatedAt          time.Time  `json:"created_at"`
 	UpdatedAt          time.Time  `json:"updated_at"`
@@ -49,17 +50,19 @@ type UserCreatedResponse struct {
 }
 
 type LocationUpdate struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
+	Latitude  float64  `json:"latitude"`
+	Longitude float64  `json:"longitude"`
+	Heading   *float64 `json:"heading,omitempty"` // Direction in degrees (0-360)
 }
 
 type LocationBroadcast struct {
-	UserID       int     `json:"user_id"`
-	UniversityID string  `json:"university_id"`
-	FirstName    string  `json:"first_name"`
-	LastName     string  `json:"last_name"`
-	UserType     string  `json:"user_type"`
-	Latitude     float64 `json:"latitude"`
-	Longitude    float64 `json:"longitude"`
-	Timestamp    int64   `json:"timestamp"`
+	UserID       int      `json:"user_id"`
+	UniversityID string   `json:"university_id"`
+	FirstName    string   `json:"first_name"`
+	LastName     string   `json:"last_name"`
+	UserType     string   `json:"user_type"`
+	Latitude     float64  `json:"latitude"`
+	Longitude    float64  `json:"longitude"`
+	Heading      *float64 `json:"heading,omitempty"` // Direction in degrees (0-360)
+	Timestamp    int64    `json:"timestamp"`
 }

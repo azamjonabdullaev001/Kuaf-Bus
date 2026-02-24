@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"backend/models"
@@ -48,9 +49,16 @@ func (h *Hub) Run() {
 			// Broadcast location update to all connected clients
 			messageJSON, err := json.Marshal(message)
 			if err != nil {
-				log.Printf("Error marshaling broadcast message: %v", err)
+				log.Printf("[Hub] Error marshaling broadcast message: %v", err)
 				continue
 			}
+			
+			headingStr := "null"
+			if message.Heading != nil {
+				headingStr = fmt.Sprintf("%.1f°", *message.Heading)
+			}
+			log.Printf("[Hub] Broadcasting to %d clients: user_id=%d, user_type=%s, lat=%.6f, lon=%.6f, heading=%s",
+				len(h.Clients), message.UserID, message.UserType, message.Latitude, message.Longitude, headingStr)
 
 			for client := range h.Clients {
 				select {

@@ -1,0 +1,116 @@
+============================================
+🔧 DOCKER TARMOQ XATOSINI HAL QILISH
+============================================
+
+XATO:
+failed to resolve source metadata for docker.io/library/node:18-alpine
+dial tcp: lookup registry-1.docker.io: no such host
+
+SABAB:
+Docker Docker Hub registry'ga ulana olmayapti (internet/DNS muammosi)
+
+============================================
+✅ YECHIM 1: DOCKER'SIZ ISHGA TUSHIRISH (ENG OSON)
+============================================
+
+1. Admin panelni Docker'siz ishga tushiring:
+
+   start-admin-NO-DOCKER.bat
+
+2. Backend ishlab turishi kerak:
+
+   docker-compose up -d backend postgres
+
+3. Brauzerda oching: http://localhost:3000
+
+============================================
+✅ YECHIM 2: INTERNETNI TEKSHIRISH
+============================================
+
+Terminal'da bajaring:
+
+1. ping google.com
+2. ping registry-1.docker.io
+
+Agar "could not find host" chiqsa → Internet yo'q yoki DNS ishlamayapti
+
+============================================
+✅ YECHIM 3: DOCKER DESKTOP QAYTA ISHGA TUSHIRISH
+============================================
+
+1. Docker Desktop'ni butunlay yoping
+2. Windows'ni qayta ishga tushiring
+3. Docker Desktop'ni qayta oching
+4. Qayta urinib ko'ring:
+
+   docker-compose build admin-panel
+
+============================================
+✅ YECHIM 4: DOCKER DNS O'ZGARTIRISH
+============================================
+
+1. Docker Desktop ochib: ⚙ Settings
+2. Docker Engine bo'limida
+3. Quyidagini JSON'ga qo'shing:
+
+{
+  "dns": ["8.8.8.8", "8.8.4.4", "1.1.1.1"]
+}
+
+4. Apply & Restart
+5. Qayta urinib ko'ring
+
+============================================
+✅ YECHIM 5: PROXY MUAMMOSI
+============================================
+
+Agar korporativ tarmoqda bo'lsangiz:
+
+1. Docker Desktop → Settings → Resources → Proxies
+2. Proxy sozlamalarini kiriting (agar kerak bo'lsa)
+
+============================================
+✅ YECHIM 6: BUTUN DOCKER'NI QAYTA O'RNATISH
+============================================
+
+1. Docker Desktop'ni o'chirib tashlang
+2. C:\ProgramData\Docker papkasini o'chiring
+3. C:\Users\[User]\.docker papkasini o'chiring
+4. Docker Desktop'ni qayta o'rnating
+5. Windows'ni qayta ishga tushiring
+
+============================================
+🚀 TEZKOR YECHIM (DOCKER'SIZ):
+============================================
+
+Agar Docker muammosini hal qilish uzoq vaqt olsa:
+
+# Backend
+cd backend
+go run main.go
+
+# Admin Panel (yangi terminal)
+cd admin-panel
+npm install
+npm start
+
+# PostgreSQL (agar kerak bo'lsa)
+docker-compose up -d postgres
+
+Bu holatda:
+- Backend: http://localhost:8080
+- Admin: http://localhost:3000
+- Faqat Postgres Docker'da
+
+============================================
+📝 O'ZBEKCHA ADMIN PANEL TAYYOR!
+============================================
+
+Kod tayyor:
+✅ Barcha uzbek tilida
+✅ Shablon tugmasi o'chirildi
+✅ Faqat Docker build qilish kerak
+
+Docker ishlamaganida yuqoridagi yechimlarni sinab ko'ring
+
+============================================
