@@ -49,13 +49,7 @@ echo -e "${GREEN}✅ Docker Compose: $DC${NC}"
 echo ""
 echo -e "${CYAN}[2/6] Настройка IP адреса...${NC}"
 
-# Автоматическое определение внешнего IP
-VPS_IP=$(curl -s -4 ifconfig.me 2>/dev/null || curl -s -4 icanhazip.com 2>/dev/null || echo "")
-
-if [ -z "$VPS_IP" ]; then
-    echo -e "${YELLOW}Не удалось определить IP автоматически.${NC}"
-    read -p "Введите IP адрес вашего VPS: " VPS_IP
-fi
+VPS_IP="84.247.138.53"
 
 echo -e "${GREEN}✅ IP адрес VPS: ${VPS_IP}${NC}"
 
@@ -79,18 +73,18 @@ POSTGRES_PASSWORD=${DB_PASS}
 POSTGRES_DB=bus_tracking
 
 # Backend
-PORT=8080
+PORT=8083
 DB_HOST=postgres
 DB_PORT=5432
 DB_USER=bususer
 DB_PASSWORD=${DB_PASS}
 DB_NAME=bus_tracking
 JWT_SECRET=${JWT_SECRET}
-ALLOWED_ORIGINS=http://${VPS_IP},http://${VPS_IP}:80,http://${VPS_IP}:3001
+ALLOWED_ORIGINS=http://${VPS_IP},http://${VPS_IP}:3002
 ENVIRONMENT=production
 
 # Admin Panel
-REACT_APP_API_URL=http://${VPS_IP}:8080/api
+REACT_APP_API_URL=http://${VPS_IP}:8083/api
 EOF
 
 echo -e "${GREEN}✅ .env.production создан${NC}"
@@ -127,7 +121,7 @@ server {
 
     # API proxy
     location /api {
-        proxy_pass http://backend:8080;
+        proxy_pass http://backend:8083;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -139,7 +133,7 @@ server {
 
     # WebSocket proxy
     location /ws {
-        proxy_pass http://backend:8080;
+        proxy_pass http://backend:8083;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -187,7 +181,7 @@ services:
       dockerfile: Dockerfile.prod
     container_name: kuafbus-backend
     ports:
-      - "8080:8080"
+      - "8083:8083"
     env_file:
       - .env.production
     depends_on:
@@ -197,7 +191,7 @@ services:
       - kuafbus
     restart: always
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -209,10 +203,10 @@ services:
       context: ./admin-panel
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_URL: http://${VPS_IP}:8080/api
+        REACT_APP_API_URL: http://${VPS_IP}:8083/api
     container_name: kuafbus-admin
     ports:
-      - "80:80"
+      - "3002:80"
     depends_on:
       - backend
     networks:
@@ -262,14 +256,14 @@ $DC -f docker-compose.vps.yml ps
 echo ""
 
 # Проверка backend
-if curl -sf http://localhost:8080/api/health >/dev/null 2>&1; then
+if curl -sf http://localhost:8083/api/health >/dev/null 2>&1; then
     echo -e "${GREEN}✅ Backend — РАБОТАЕТ${NC}"
 else
     echo -e "${RED}⚠️  Backend — загружается, подождите ещё 30 сек${NC}"
 fi
 
 # Проверка admin panel
-if curl -sf http://localhost:80 >/dev/null 2>&1; then
+if curl -sf http://localhost:3002 >/dev/null 2>&1; then
     echo -e "${GREEN}✅ Admin Panel — РАБОТАЕТ${NC}"
 else
     echo -e "${RED}⚠️  Admin Panel — загружается${NC}"
@@ -280,11 +274,11 @@ echo ""
 echo -e "${CYAN}Настройка UFW Firewall...${NC}"
 if command -v ufw &>/dev/null; then
     sudo ufw allow 22/tcp   >/dev/null 2>&1  # SSH
-    sudo ufw allow 80/tcp   >/dev/null 2>&1  # HTTP (Admin Panel)
-    sudo ufw allow 8080/tcp >/dev/null 2>&1  # Backend API + WebSocket
-    echo -e "${GREEN}✅ Порты 22, 80, 8080 открыты${NC}"
+    sudo ufw allow 3002/tcp >/dev/null 2>&1  # HTTP (Admin Panel)
+    sudo ufw allow 8083/tcp >/dev/null 2>&1  # Backend API + WebSocket
+    echo -e "${GREEN}✅ Порты 22, 3002, 8083 открыты${NC}"
 else
-    echo -e "${YELLOW}UFW не установлен. Убедитесь, что порты 80 и 8080 открыты.${NC}"
+    echo -e "${YELLOW}UFW не установлен. Убедитесь, что порты 3002 и 8083 открыты.${NC}"
 fi
 
 # ─── Итог ────────────────────────────────────────────────────
@@ -293,17 +287,17 @@ echo -e "${GREEN}╔════════════════════
 echo -e "${GREEN}║         УСТАНОВКА ЗАВЕРШЕНА УСПЕШНО!              ║${NC}"
 echo -e "${GREEN}╚═══════════════════════════════════════════════════╝${NC}"
 echo ""
-echo -e "  ${CYAN}Admin Panel:${NC}  http://${VPS_IP}"
-echo -e "  ${CYAN}API:${NC}          http://${VPS_IP}:8080/api"
-echo -e "  ${CYAN}WebSocket:${NC}    ws://${VPS_IP}:8080/ws"
+echo -e "  ${CYAN}Admin Panel:${NC}  http://${VPS_IP}:3002"
+echo -e "  ${CYAN}API:${NC}          http://${VPS_IP}:8083/api"
+echo -e "  ${CYAN}WebSocket:${NC}    ws://${VPS_IP}:8083/ws"
 echo ""
 echo -e "  ${CYAN}Логин Admin:${NC}"
 echo -e "    ID:       ${YELLOW}65837499i9${NC}"
 echo -e "    Пароль:   ${YELLOW}K7mP9nQ2rS5tV8xW1yZ4aB6cD3eF${NC}"
 echo ""
 echo -e "  ${CYAN}Для мобилки (bus/config.js) поменяй:${NC}"
-echo -e "    API_URL:  ${YELLOW}http://${VPS_IP}:8080${NC}"
-echo -e "    WS_URL:   ${YELLOW}ws://${VPS_IP}:8080/ws${NC}"
+echo -e "    API_URL:  ${YELLOW}http://${VPS_IP}:8083${NC}"
+echo -e "    WS_URL:   ${YELLOW}ws://${VPS_IP}:8083/ws${NC}"
 echo ""
 echo -e "  ${CYAN}Полезные команды:${NC}"
 echo -e "    Логи:     ${YELLOW}$DC -f docker-compose.vps.yml logs -f${NC}"
