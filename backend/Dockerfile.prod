@@ -12,8 +12,8 @@ ENV GOSUMDB=off
 # Copy go mod files
 COPY go.mod go.sum* ./
 
-# Download dependencies
-RUN go mod download
+# Generate go.sum and download dependencies
+RUN go mod tidy && go mod download
 
 # Copy all source code
 COPY . .
@@ -37,6 +37,6 @@ COPY --from=builder /app/main /main
 # Use non-root user
 USER 1000:1000
 
-EXPOSE 8080
+EXPOSE 8083
 
 ENTRYPOINT ["/main"]
