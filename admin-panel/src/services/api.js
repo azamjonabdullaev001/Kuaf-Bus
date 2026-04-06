@@ -10,6 +10,10 @@ const getApiUrl = () => {
   if (process.env.REACT_APP_API_URL) {
     return process.env.REACT_APP_API_URL;
   }
+  // Production VPS
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    return `http://${window.location.hostname}:8083/api`;
+  }
   // Default to localhost for development
   return 'http://localhost:8080/api';
 };
